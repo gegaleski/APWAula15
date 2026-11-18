@@ -1,0 +1,48 @@
+API Django — rotas e exemplos (POST com Content-Type: application/json)
+
+1) Criar usuário sem token: POST /api/usuarios/cadastrar/
+{"username":"aluno1","password":"SenhaForte123!","nome":"Aluno Teste","email":"aluno1@example.com","telefone":"11999999999"}
+
+2) Login JWT: POST /api/token/
+{"username":"aluno1","password":"SenhaForte123!"}
+Copie o valor de access do retorno. Nas próximas operações protegidas:
+Authorization: Bearer SEU_ACCESS_TOKEN
+
+3) Criar produto com JWT: POST /api/produtos/
+{"nome":"Notebook","quantidade":10,"preco":"3500.00"}
+{"nome":"Mouse","quantidade":20,"preco":"100.00"}
+
+4) Listar produtos sem JWT: GET /api/produtos/
+
+5) Criar pedido com JWT: POST /api/pedidos/
+{"descricao":"Pedido de materiais","itens":[{"produto":"Notebook","quantidade":1},{"produto":"Mouse","quantidade":2}]}
+O cliente é associado automaticamente pelo usuário autenticado.
+O total será 3700.00 (valor numérico conforme representação JSON do DRF).
+
+6) Listar meus pedidos com JWT: GET /api/pedidos/
+
+7) Atualizar status (somente administrador): PATCH /api/status-pedido/1/
+{"status":"PAGO"}
+
+IMPORTANTE: nomes de produtos devem ser únicos (inclusive diferenças de maiúsculas/minúsculas).
+Ao ocorrer duplicidade, a API devolve um erro claro; renomeie os registros duplicados.
+O campo 'categoria' de produto continua opcional e aceita ID de uma categoria existente.
+
+Para executar localmente:
+python -m pip install -r requirements.txt
+python manage.py check
+python manage.py migrate
+python manage.py runserver
+
+Na Railway/Neon, configure DATABASE_URL e SECRET_KEY em variáveis de ambiente,
+e execute as migrações no banco de produção. Não publique DEBUG=True.
+
+NOVO FORMATO SIMPLES - POST /api/pedidos/ (Bearer JWT obrigatório)
+{
+  "produto": "Notebook",
+  "quantidade": 2,
+  "cliente": "Aluno Teste"
+}
+
+O cliente precisa ser o mesmo nome do cliente vinculado ao JWT.
+O formato anterior com lista "itens" continua aceito.
